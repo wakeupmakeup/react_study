@@ -1,35 +1,20 @@
-/*
+import logo from './logo.svg';  // logo.svg 파일을 import합니다. 해당 파일은 React 앱의 로고로 사용될 수 있습니다. 하지만 이 코드에서는 실제로 사용되지 않는 것으로 보입니다.
+import './App.css';  // App.css 스타일시트를 import합니다. 이 파일에는 이 앱에서 사용되는 CSS 스타일이 정의되어 있습니다.
+import { useState } from 'react'; // React의 Hook인 useState를 import합니다. useState는 함수형 컴포넌트에서 상태를 관리하는 데 사용됩니다.
 
-7. state
-
-prop처럼 새로운 return 값을 만들어 주는 데이터
-이 둘다 이 값이 변경되면 새로운 리턴값이 된다
-
-prop은 컴포넌트를 사용하는 외부자를 위한 데이터
-state는 컴포넌트를 만드는 내부자를 위한 데이터임.
-
-*/
-
-
-import logo from './logo.svg';
-import './App.css';
-import { useState } from 'react';
-// 이걸 임포트 시킨다. 
-
-// 그리고 mode라는 지역 변수들을 이제 state로 업그레이드 시킬 것임.
-// 업그레이드는 useState()를 사용하면 됨.
-
+// Header라는 이름의 함수형 컴포넌트를 정의합니다. 이 컴포넌트는 웹 페이지의 헤더 부분을 렌더링하는 역할을 합니다.
 function Header(props) {
+  // a 태그를 클릭했을 때의 기본 동작인 페이지 이동을 막고, props로 받은 onChangeMode 함수를 호출합니다. 
+  // 이 함수를 통해 App 컴포넌트의 mode 상태가 변경됩니다.
   return <header>
-
     <h1><a href="/" onClick={function (event) {
       event.preventDefault();
-
       props.onChangeMode();
     }}>{props.title}</a></h1>
   </header>
 }
 
+// Nav라는 이름의 함수형 컴포넌트를 정의합니다. 이 컴포넌트는 네비게이션 메뉴를 렌더링하는 역할을 합니다.
 function Nav(props) {
   const list = [
     <li><a href="/read/1">html</a></li>,
@@ -37,13 +22,15 @@ function Nav(props) {
     <li><a href="/read/3">js</a></li>
   ]
 
+  // props로 받은 topics 배열을 순회하면서 각 항목에 대한 리스트 아이템을 생성합니다. 
+  // 각 리스트 아이템은 a 태그를 포함하고 있으며, a 태그를 클릭하면 기본 동작인 페이지 이동을 막고 
+  // props로 받은 onChangeMode 함수를 호출하여 App 컴포넌트의 mode와 id 상태를 변경합니다.
   for (let i = 0; i < props.topics.length; i++) {
     let t = props.topics[i];
     list.push(<li key={t.id}>
       <a id={t.id} href={'/read/' + t.id} onClick={event => {
         event.preventDefault();
         props.onChangeMode(Number(event.target.id));
-
       }}>{t.title}</a>
     </li>)
   }
@@ -54,6 +41,7 @@ function Nav(props) {
   </nav>
 }
 
+// Article이라는 이름의 함수형 컴포넌트를 정의합니다. 이 컴포넌트는 선택된 항목의 내용을 표시하는 역할을 합니다. 
 function Article(props) {
   return <article>
     <h2>{props.title}</h2>
@@ -61,29 +49,43 @@ function Article(props) {
   </article>
 }
 
-function App() {
-  // const _mode = useState("WELCOME");
-  // 이 값을 콘솔로 보면 0번째 값은 상태의 값을 읽을때 쓰는 데이터
-  // 1번째 데이터는 그 상태의 값을 변경할때 사용하는 함수를 나타낸다.
-  // 즉, const mode = _mode[0]; 이렇게 하면 mode의 값을 통해 상태의 값을 읽을 수 있음.
-  // const setMode = _mode[1]; 이렇게 하면 setMode를 통해 mode의 값을 설정할 수 있다는 것이다. 
-  // 위에 처럼 하면 복잡하니까 보통은 아래 처럼 사용한다. 
+// Create라는 이름의 함수형 컴포넌트를 정의합니다. 이 컴포넌트는 새로운 항목을 생성하는 폼을 렌더링합니다.
+function Create(props) {
+  // 폼을 제출하면 기본 동작인 페이지 리로드를 막고, 입력 필드에서 값을 가져와서 props로 받은 onCreate 함수를 호출합니다.
+  // 이 함수를 통해 App 컴포넌트의 topics 상태가 변경됩니다.
+  return <article>
+    <h2>Create</h2>
+    <form onSubmit={event => {
+      event.preventDefault();
+      const title = event.target.title.value;
+      const body = event.target.body.value;
+      props.onCreate(title, body);
+    }}>
+      <p><input type="text" name="title" placeholder='title' /></p>
+      <p><textarea name="body" placeholder='body'></textarea></p>
+      <p><input type="submit" value="Create"></input></p>
+    </form>
+  </article>
+}
 
+// App이라는 이름의 함수형 컴포넌트를 정의합니다. 이 컴포넌트는 전체 앱의 상태를 관리하고, 다른 컴포넌트들을 조합하여 전체 앱을 렌더링합니다. 
+function App() {
+  // useState를 사용하여 앱의 현재 모드, 선택된 항목의 ID, 다음에 생성될 항목의 ID, 그리고 현재의 모든 항목을 저장하고 있는 topics를 상태로 관리합니다.
   const [mode, setMode] = useState('WELCOME');
   const [id, setId] = useState(null);
-
-  const topics = [
+  const [nextId, setNextId] = useState(4);
+  const [topics, setTopics] = useState([
     { id: 1, title: 'html', body: 'html is ...' },
     { id: 2, title: 'css', body: 'css is ...' },
     { id: 3, title: 'js', body: 'js is ...' }
-  ]
+  ])
 
   let content = null;
 
+  // mode의 값에 따라서 content를 결정합니다.
   if (mode === 'WELCOME') {
     content = <Article title="Welcome" body="Hello, Web"></Article>
   } else if (mode === 'READ') {
-
     let title, body = null;
 
     for (let i = 0; i < topics.length; i++) {
@@ -93,38 +95,37 @@ function App() {
       }
     }
     content = <Article title={title} body={body}></Article>
-    // 이렇게 하면 아무런 일이 일어나지 않는다.
-    // 왜냐면 이렇게 디버깅을 하면 console.log(topics[i].id, id);
-    // topics.id 값은 1,2,3에 숫자인데 id state값은 '2'라는 문자로 나와서 그렇다. 
-    // 왜 문자로 나오냐면 그 이유는 아래와 같다. 
-
-    // 먼저 id state 값은 setId에서 왔고
-    // 또 setId는 아래 함수인 setId(_id)에서 사용된다. 
-    // 여기 _id값은 Nav안에서 왔다. 
-    // nav의 내부로 들어가보면 event.target.id을 통해서 id 값을 알아내는데 
-    // 그 id 값은 {t.id}에 들어있다. 그리고 입력한 값은 숫자지만 태그의 속성으로 넘기면
-    // 그것은 문자가 된다.
-    // 따라서 문자가 된 데이터를 숫자로 바꿔주면 된다. 
-    // 바꾸는 방법은 Number 함수를 사용하면 된다. 
+  } else if (mode === 'CREATE') {
+    // mode가 'CREATE'일 때, Create 컴포넌트를 렌더링합니다.
+    content = <Create onCreate={(_title, _body) => {
+      const newTopic = { id: nextId, title: _title, body: _body }
+      const newTopics = [...topics]
+      newTopics.push(newTopic);
+      setTopics([...topics, newTopic]);
+      setMode('READ');
+      setId(nextId);
+      setNextId(nextId + 1);
+    }}></Create>
   }
+
+  // App 컴포넌트의 렌더링 결과입니다. Header, Nav, content, 그리고 'Create' 링크를 렌더링합니다.
   return (
     <div>
       <Header title="Web" onChangeMode={() => {
-        // mode = 'WELCOME';
-        // 값을 바꿀때는 setMode를 사용하자.
         setMode('WELCOME');
       }}></Header>
       <Nav topics={topics} onChangeMode={(_id) => {
-        // mode = 'READ';
         setMode('READ');
         setId(_id);
       }}></Nav>
       {content}
+      <a href="/create" onClick={event => {
+        event.preventDefault();
+        setMode('CREATE');
+      }}>Create</a>
     </div>
   );
-
-  {/* 여기서 mode 값을 다르게 줘도 아무런 반응이 일어나지 않는다. 
-여기서 값을 바꾼들 위에 App()에서 리프레시가 나면서 UI가 변경되야 하는데 리프레시가 되지
-않기 때문이다. 이를 위해 맨 위에다가 state 특성을 임포트 시킨다. */}
 }
+
+// App 컴포넌트를 export합니다. 다른 파일에서 이 컴포넌트를 import하여 사용할 수 있습니다.
 export default App;
